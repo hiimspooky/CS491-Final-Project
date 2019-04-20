@@ -26,7 +26,7 @@ import net.dean.jraw.references.SubredditReference;
 public class App 
 {
 	
-	int DEFAULT_DEPTH = 10;
+	static int DEFAULT_DEPTH = 10;
 	
 
 	
@@ -155,7 +155,7 @@ public class App
     			
 				subreddit_top_posts temp = new subreddit_top_posts();
 //    			for (int y = 0; y < 10; y++) if (firstPage.get(y) != null) System.out.println(firstPage.get(y).getUrl());
-    			for (int y = 0; y < 10; y++) {
+    			for (int y = 0; y < DEFAULT_DEPTH; y++) {
     				if (firstPage.get(y) != null) {
     					temp.urls.add(firstPage.get(y).getUrl());
     					temp.score.add(firstPage.get(y).getScore());
