@@ -5,6 +5,7 @@ import java.util.Vector;
 public class subreddit_top_posts {
 	
 		String name;
+		int subscribers;
 	    Vector<String> urls = new Vector<String>();
 	    Vector<Integer> scores = new Vector<Integer>();
 	    Vector<Integer> numComments = new Vector<Integer>();

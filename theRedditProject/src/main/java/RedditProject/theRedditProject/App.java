@@ -155,6 +155,7 @@ public class App
     			
 				subreddit_top_posts temp = new subreddit_top_posts();
 				temp.name = subreddits_reference.get(x).getSubreddit();
+				temp.subscribers = subreddits_reference.get(x).about().getSubscribers();
 //    			for (int y = 0; y < 10; y++) if (firstPage.get(y) != null) System.out.println(firstPage.get(y).getUrl());
     			for (int y = 0; y < DEFAULT_DEPTH; y++) {
     				if (firstPage.get(y) != null) {
@@ -177,7 +178,7 @@ public class App
     		
     		System.out.println(total_subreddit_list.size());
     		for (int x = 0; x < total_subreddit_list.size(); x++) {
-    			System.out.println(total_subreddit_list.get(x).name);
+    			System.out.println(total_subreddit_list.get(x).name + " with " + total_subreddit_list.get(x).subscribers + " subscribers");
     			for (int y = 0; y < total_subreddit_list.get(x).urls.size(); y++) {
     				System.out.println(total_subreddit_list.get(x).urls.get(y));
     				System.out.println(total_subreddit_list.get(x).numComments.get(y));
