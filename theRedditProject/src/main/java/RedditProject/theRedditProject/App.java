@@ -217,12 +217,17 @@ public class App
     		 String origin = "origin";
     		 graph.addVertex(origin);
     		 
-    		 for (int a=1; i<=subreddits_string.size(); a++) {
+    		 for (int a=0; a<subreddits_string.size(); a++) {
     			 graph.addVertex(subreddits_string.get(a));
     			 graph.addEdge(origin, subreddits_string.get(a));
     			 graph.setEdgeWeight(origin, subreddits_string.get(a), subreddits_relevancy.get(a));
     			 names.add(subreddits_string.get(a));
     		 }
+    		 
+     		DijkstraShortestPath<String, DefaultEdge> alg = new DijkstraShortestPath<String, DefaultEdge>(graph);
+      		
+    		SingleSourcePaths<String, DefaultEdge> iPaths = alg.getPaths(origin);
+    		System.out.println(alg.getPathWeight(origin, subreddits_string.get(1)));
     			 
     		 
     		 
@@ -240,14 +245,6 @@ public class App
 //    		relevanceGraph.setEdgeWeight(origin, subreddits_string.get(1), 1);
 //    		relevanceGraph.setEdgeWeight(origin, subreddits_string.get(2), 2);
 //    		relevanceGraph.setEdgeWeight(subreddits_string.get(2), subreddits_string.get(3), 4);
-    		
-    		
-    		DijkstraShortestPath<String, DefaultEdge> alg = new DijkstraShortestPath<String, DefaultEdge>(graph);
-//    		
-//    		System.out.println("now here");
-//    		
-    		SingleSourcePaths<String, DefaultEdge> iPaths = alg.getPaths(origin);
-//    		System.out.println(alg.getPathWeight(origin, subreddits_string.get(3)));
 //    		
     		
     		
