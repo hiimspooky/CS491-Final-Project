@@ -23,20 +23,28 @@ import net.dean.jraw.pagination.Paginator;
 import net.dean.jraw.references.SubredditReference;
 
 
-public class App 
-{
-	
-	static int DEFAULT_DEPTH = 10;
-	
+import org.jgrapht.*;
+import org.jgrapht.graph.*;
+import org.jgrapht.util.*;
+import org.jgrapht.alg.shortestpath.*;
+import org.jgrapht.alg.interfaces.AStarAdmissibleHeuristic;
+import org.jgrapht.alg.interfaces.ShortestPathAlgorithm.*;
 
-	
+
+public class App
+{
+
+	static int DEFAULT_DEPTH = 10;
+
+
+
     public static void main( String[] args ) throws IOException
     {
-    	
+
         Scanner myObj = new Scanner(System.in);
         System.out.println("Enter URL exactly as it appears in browser (Copy and Paste it!)");
         String userInput = myObj.nextLine();
-    	
+
     	Document doc = Jsoup.connect("https://www.reddit.com/api/info.json?url=" + userInput).ignoreContentType(true).get();
     	Element body = doc.body();
     	String bodyText = body.text();
@@ -45,11 +53,11 @@ public class App
     	if (bodyText.toLowerCase().contains("children\": []")) {
     		System.out.println("That URL has not been posted to Reddit before. Try another!");
     	}
-    	
+
     	else {
-    		
+
     		int searchDegree = 0;
-    		
+
     		int numSubReddits = 0;
     		String findStr = "subreddit\": \"";
     		int lastIndex = 0;
@@ -62,11 +70,11 @@ public class App
     		        lastIndex += findStr.length();
     		    }
     		}
-    		
+
     		int i = 0;
     		i = bodyText.indexOf("subreddit\": ", 0);
-    		
-    		
+
+
     		String[] splitText = bodyText.split(" ");
 
     		Vector<String> subreddits_string = new Vector<String>();
@@ -79,35 +87,35 @@ public class App
     			else if (splitText[a].contains("\"subreddit_subscribers\":")) subreddits_subs.add(splitText[a+1]);
     			else if (splitText[a].contains("\"score\":")) subreddits_scores.add(splitText[a+1]);
     		}
-    		
+
     		for (int c = 0; c < subreddits_subs.size(); c++) {
     			subreddits_subs.set(c, subreddits_subs.get(c).replace(",", ""));
     		}
-    		
-    		for (int c = 0; c < subreddits_scores.size(); c++) { 
+
+    		for (int c = 0; c < subreddits_scores.size(); c++) {
     			subreddits_scores.set(c, subreddits_scores.get(c).replace(",", ""));
     		}
-    		
+
     		for (int c = 0; c < subreddits_string.size(); c++) {
     			String temp = subreddits_string.get(c);
     			temp = temp.replaceFirst("\"", "");
     			temp = temp.replace("\",", "");
     			subreddits_string.set(c, temp);
     		}
-    		
+
     		for (int x = 0; x < subreddits_string.size(); x++) System.out.println(subreddits_string.get(x) + ": " + subreddits_subs.get(x) + " (" + subreddits_scores.get(x) + ")");
-    		
+
     		System.out.println("Enter a search degree for related subreddits (Suggested 0,5,10):");
-    		
+
     		searchDegree = Integer.parseInt(myObj.nextLine());
-    		
+
     		Vector<Double> subreddits_relevancy = new Vector<Double>();
-    		
+
     		for (int x = 0; x < subreddits_string.size(); x++) subreddits_relevancy.add(Double.parseDouble(subreddits_scores.get(x))/Double.parseDouble(subreddits_subs.get(x)));
-    		
+
     		for (int x = 0; x < subreddits_relevancy.size(); x++) System.out.println(subreddits_relevancy.get(x));
-    		
-    		
+
+
 
     		UserAgent userAgent = new UserAgent("java:RedditProject:v1.0 (by /u/cs491smda)");
     		net.dean.jraw.oauth.Credentials credentials = net.dean.jraw.oauth.Credentials.script("cs491smda", "rolltide",
@@ -120,39 +128,39 @@ public class App
     		System.out.println(sr.getSubscribers());
     		Vector<SubredditReference> subreddits_reference = new Vector<SubredditReference>();
     		for (int x = 0; x < subreddits_string.size(); x++) subreddits_reference.add(reddit.subreddit(subreddits_string.get(x)));
-    		
+
     		for (int x = 0; x < subreddits_reference.size(); x++) System.out.println(subreddits_reference.get(x).getSubreddit());
-    		
-    		
+
+
     		/*
     		DefaultPaginator<Submission> paginator = subreddits_reference.get(0).posts()
     				.limit(Paginator.RECOMMENDED_MAX_LIMIT)
     				.sorting(SubredditSort.TOP)
     				.timePeriod(TimePeriod.ALL)
     				.build();
-    		
-    		
+
+
     		Listing<Submission> firstPage = paginator.next();
-    		
+
     		*/
-    		
+
     		System.out.println("FLAGFLAGFLAG");
-    		
-    		
+
+
     		Vector<subreddit_top_posts> total_subreddit_list = new Vector<subreddit_top_posts>();
-    		
+
     		for (int x = 0; x < subreddits_reference.size(); x++) {
-    			
+
 //    			System.out.println(subreddits_reference.get(x).getSubreddit());
-    			
+
     			DefaultPaginator<Submission> paginator = subreddits_reference.get(x).posts()
         				.limit(Paginator.RECOMMENDED_MAX_LIMIT)
         				.sorting(SubredditSort.TOP)
         				.timePeriod(TimePeriod.ALL)
         				.build();
-    			
+
     			Listing<Submission> firstPage = paginator.next();
-    			
+
 				subreddit_top_posts temp = new subreddit_top_posts();
 				temp.name = subreddits_reference.get(x).getSubreddit();
 				temp.subscribers = subreddits_reference.get(x).about().getSubscribers();
@@ -164,18 +172,18 @@ public class App
     					temp.numComments.add(firstPage.get(y).getCommentCount());
     				}
     			}
-    				
+
     			total_subreddit_list.add(temp);
-    			
-    			
-    			
+
+
+
     			//for (int y = 0; y < 10; y++) if (firstPage. != null) total_subreddit_list.add(
-    			
-    			
+
+
     		}
-    		
+
     		System.out.println("GALFGALFGALF");
-    		
+
     		System.out.println(total_subreddit_list.size());
     		for (int x = 0; x < total_subreddit_list.size(); x++) {
     			System.out.println(total_subreddit_list.get(x).name + " with " + total_subreddit_list.get(x).subscribers + " subscribers");
@@ -184,31 +192,69 @@ public class App
     				System.out.println(total_subreddit_list.get(x).numComments.get(y));
     			}
     		}
-    		
-    		
-    		
+
+
+
     		/*
     		for (Submission post : firstPage) {
     			System.out.println(String.format("%s (/r/%s, %s points) - %s",
                         post.getTitle(), post.getSubreddit(), post.getScore(), post.getUrl()));
     		}
     		*/
-    		
-    		
-    		
-    		
-    		
-    		//Construct graph
-    		
-    		
-    		
-    		
-    		
-    		
-    		
-    		
-    	
+
+
+
+
+
+    		//Construct graph\
+
+    		 System.out.println("here");
+
+    		 Graph<String, DefaultEdge> graph = new SimpleDirectedWeightedGraph<String, DefaultEdge>(DefaultEdge.class);
+
+    		 Vector<String> names = new Vector<String>();
+
+    		 String origin = "origin";
+    		 graph.addVertex(origin);
+
+    		 for (int a=1; i<=subreddits_string.size(); a++) {
+    			 graph.addVertex(subreddits_string.get(a));
+    			 graph.addEdge(origin, subreddits_string.get(a));
+    			 graph.setEdgeWeight(origin, subreddits_string.get(a), subreddits_relevancy.get(a));
+    			 names.add(subreddits_string.get(a));
+    		 }
+
+
+
+
+
+//    		relevanceGraph.addVertex(origin);
+//    		relevanceGraph.addVertex(subreddits_string.get(1));
+//    		relevanceGraph.addVertex(subreddits_string.get(2));
+//    		relevanceGraph.addVertex(subreddits_string.get(3));
+//
+//    		relevanceGraph.addEdge(origin, subreddits_string.get(1));
+//    		relevanceGraph.addEdge(origin, subreddits_string.get(2));
+//    		relevanceGraph.addEdge(subreddits_string.get(2), subreddits_string.get(3));
+//
+//    		relevanceGraph.setEdgeWeight(origin, subreddits_string.get(1), 1);
+//    		relevanceGraph.setEdgeWeight(origin, subreddits_string.get(2), 2);
+//    		relevanceGraph.setEdgeWeight(subreddits_string.get(2), subreddits_string.get(3), 4);
+
+
+    		DijkstraShortestPath<String, DefaultEdge> alg = new DijkstraShortestPath<String, DefaultEdge>(graph);
+//
+//    		System.out.println("now here");
+//
+    		SingleSourcePaths<String, DefaultEdge> iPaths = alg.getPaths(origin);
+//    		System.out.println(alg.getPathWeight(origin, subreddits_string.get(3)));
+//
+
+
+
+
+
     	} //closes else
-    	
+
     }
 }
