@@ -23,6 +23,14 @@ import net.dean.jraw.pagination.Paginator;
 import net.dean.jraw.references.SubredditReference;
 
 
+import org.jgrapht.*;
+import org.jgrapht.graph.*;
+import org.jgrapht.util.*;
+import org.jgrapht.alg.shortestpath.*;
+import org.jgrapht.alg.interfaces.AStarAdmissibleHeuristic;
+import org.jgrapht.alg.interfaces.ShortestPathAlgorithm.*;
+
+
 public class App 
 {
 	
@@ -198,11 +206,49 @@ public class App
     		
     		
     		
-    		//Construct graph
+    		//Construct graph\
+    		
+    		 System.out.println("here");
+    		
+    		 Graph<String, DefaultEdge> graph = new SimpleDirectedWeightedGraph<String, DefaultEdge>(DefaultEdge.class);
+    		 
+    		 Vector<String> names = new Vector<String>();
+    		 
+    		 String origin = "origin";
+    		 graph.addVertex(origin);
+    		 
+    		 for (int a=1; i<=subreddits_string.size(); a++) {
+    			 graph.addVertex(subreddits_string.get(a));
+    			 graph.addEdge(origin, subreddits_string.get(a));
+    			 graph.setEdgeWeight(origin, subreddits_string.get(a), subreddits_relevancy.get(a));
+    			 names.add(subreddits_string.get(a));
+    		 }
+    			 
+    		 
+    		 
+    		 
+    		
+//    		relevanceGraph.addVertex(origin);
+//    		relevanceGraph.addVertex(subreddits_string.get(1));
+//    		relevanceGraph.addVertex(subreddits_string.get(2));
+//    		relevanceGraph.addVertex(subreddits_string.get(3));
+//    		
+//    		relevanceGraph.addEdge(origin, subreddits_string.get(1));
+//    		relevanceGraph.addEdge(origin, subreddits_string.get(2));
+//    		relevanceGraph.addEdge(subreddits_string.get(2), subreddits_string.get(3));
+//    		
+//    		relevanceGraph.setEdgeWeight(origin, subreddits_string.get(1), 1);
+//    		relevanceGraph.setEdgeWeight(origin, subreddits_string.get(2), 2);
+//    		relevanceGraph.setEdgeWeight(subreddits_string.get(2), subreddits_string.get(3), 4);
     		
     		
-    		
-    		
+    		DijkstraShortestPath<String, DefaultEdge> alg = new DijkstraShortestPath<String, DefaultEdge>(graph);
+//    		
+//    		System.out.println("now here");
+//    		
+    		SingleSourcePaths<String, DefaultEdge> iPaths = alg.getPaths(origin);
+//    		System.out.println(alg.getPathWeight(origin, subreddits_string.get(3)));
+//    		
     		
     		
     		
