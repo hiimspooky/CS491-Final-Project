@@ -112,7 +112,7 @@ public class App
     		
     		for (int x = 0; x < subreddits_string.size(); x++) subreddits_relevancy.add(Double.parseDouble(subreddits_scores.get(x))/Double.parseDouble(subreddits_subs.get(x)));
     		
-    		for (int x = 0; x < subreddits_relevancy.size(); x++) System.out.println(subreddits_relevancy.get(x));
+    		for (int x = 0; x < subreddits_relevancy.size(); x++) System.out.println(1/subreddits_relevancy.get(x));
     		
     		
 
@@ -183,14 +183,14 @@ public class App
     		
     		System.out.println("GALFGALFGALF");
     		
-    		System.out.println(total_subreddit_list.size());
-    		for (int x = 0; x < total_subreddit_list.size(); x++) {
-    			System.out.println(total_subreddit_list.get(x).name + " with " + total_subreddit_list.get(x).subscribers + " subscribers");
-    			for (int y = 0; y < total_subreddit_list.get(x).urls.size(); y++) {
-    				System.out.println(total_subreddit_list.get(x).urls.get(y));
-    				System.out.println(total_subreddit_list.get(x).numComments.get(y));
-    			}
-    		}
+//    		System.out.println(total_subreddit_list.size());
+//    		for (int x = 0; x < total_subreddit_list.size(); x++) {
+//    			System.out.println(total_subreddit_list.get(x).name + " with " + total_subreddit_list.get(x).subscribers + " subscribers");
+//    			for (int y = 0; y < total_subreddit_list.get(x).urls.size(); y++) {
+//    				System.out.println(total_subreddit_list.get(x).urls.get(y));
+//    				System.out.println(total_subreddit_list.get(x).numComments.get(y));
+//    			}
+//    		}
     		
     		
     		
@@ -217,46 +217,112 @@ public class App
     		 graph.addVertex(origin);
     		 
     		 for (int a=0; a<subreddits_string.size(); a++) {
-    			 graph.addVertex(subreddits_string.get(a));
+    			 if (names.contains(subreddits_string.get(a)) == false) {
+    				 graph.addVertex(subreddits_string.get(a));
+    				 names.add(subreddits_string.get(a));
+    			 }
     			 graph.addEdge(origin, subreddits_string.get(a));
     			 graph.setEdgeWeight(origin, subreddits_string.get(a), 1/subreddits_relevancy.get(a));
-    			 names.add(subreddits_string.get(a));
     		 }
     		 
     		 
     		 for (int x=0; x<total_subreddit_list.size(); x++) {
     			 for (int y=0; y<total_subreddit_list.get(x).urls.size(); y++) {
-    				 
+    				 doc = Jsoup.connect("https://www.reddit.com/api/info.json?url=" + total_subreddit_list.get(x).urls.get(y)).ignoreContentType(true).get();
+    			     body = doc.body();
+    			     bodyText = body.text();
+    			     
+    			     if (bodyText.toLowerCase().contains("children\": []")) {
+    			    	 	break;
+    			    	}
+    			     else {
+    			    	 numSubReddits = 0;
+    			    		findStr = "subreddit\": \"";
+    			    		lastIndex = 0;
+    			    		while(lastIndex != -1){
+
+    			    		    lastIndex = bodyText.indexOf(findStr,lastIndex);
+
+    			    		    if(lastIndex != -1){
+    			    		        numSubReddits++;
+    			    		        lastIndex += findStr.length();
+    			    		    }
+    			    		}
+
+    			    		i = 0;
+    			    		i = bodyText.indexOf("subreddit\": ", 0);
+
+
+    			    		splitText = bodyText.split(" ");
+    			    		
+    			    		subreddits_string = new Vector<String>();
+    			    		subreddits_subs = new Vector<String>();
+    			    		subreddits_scores = new Vector<String>();
+    			    		
+    			    		for (int a = 0; a < splitText.length; a++) {
+    			    			if (splitText[a].contains("\"subreddit\":")) {
+    			    				subreddits_string.add(splitText[a+1]);
+    			    			}
+    			    			else if (splitText[a].contains("\"subreddit_subscribers\":")) subreddits_subs.add(splitText[a+1]);
+    			    			else if (splitText[a].contains("\"score\":")) subreddits_scores.add(splitText[a+1]);
+    			    		}
+
+    			    		for (int c = 0; c < subreddits_subs.size(); c++) {
+    			    			subreddits_subs.set(c, subreddits_subs.get(c).replace(",", ""));
+    			    		}
+
+    			    		for (int c = 0; c < subreddits_scores.size(); c++) {
+    			    			subreddits_scores.set(c, subreddits_scores.get(c).replace(",", ""));
+    			    		}
+
+    			    		for (int c = 0; c < subreddits_string.size(); c++) {
+    			    			String temp = subreddits_string.get(c);
+    			    			temp = temp.replaceFirst("\"", "");
+    			    			temp = temp.replace("\",", "");
+    			    			subreddits_string.set(c, temp);
+    			    		}
+    			    		
+    			    		for (int a=0; a<subreddits_string.size(); a++) {
+    			    			if (names.contains(subreddits_string.get(a)) == false) {
+    			    				graph.addVertex(subreddits_string.get(a));
+    			    				names.add(subreddits_string.get(a));
+    			    			}
+    			    			 graph.addEdge(origin, subreddits_string.get(a));
+    			    			 graph.setEdgeWeight(origin, subreddits_string.get(a), 1/(Double.parseDouble(subreddits_scores.get(a))/Double.parseDouble(subreddits_subs.get(a))));
+    			    		 }
+    			     }
     			 }
     		 }
-    		
     		 
-     		 DijkstraShortestPath<String, DefaultEdge> alg = new DijkstraShortestPath<String, DefaultEdge>(graph);
-      		
-    		 SingleSourcePaths<String, DefaultEdge> iPaths = alg.getPaths(origin);
-    		 System.out.println(alg.getPathWeight(origin, subreddits_string.get(1)));
-    		
-    		
-    		
-    			 
+    		 DijkstraShortestPath<String, DefaultEdge> alg = new DijkstraShortestPath<String, DefaultEdge>(graph);
     		 
+    		 Vector<String> topRed = new Vector<String>();
+    		 Vector<Double> topRel = new Vector<Double>();
     		 
+    		 for (int w=0; w<names.size(); w++) {
+    			 if (topRel.size() == 0) {
+    				 topRed.add(names.get(w));
+    				 topRel.add(alg.getPathWeight(origin, names.get(w)));
+    			 }
+    			 else {
+    				 int flag = 1;
+    				 double weight = alg.getPathWeight(origin, names.get(w));
+    				 for (int u=0; u<topRel.size(); u++) {
+    					 if (weight < topRel.get(u)) {
+    						 topRel.insertElementAt(weight, u);
+    						 topRed.insertElementAt(names.get(w), u);
+    						 flag = 0;
+    						 break;
+    					 }
+    				 }
+    				 if (flag == 1) {
+    					 topRel.add(weight);
+    					 topRed.add(names.get(w));
+    				 }
+    			 }
+    		 }
     		 
-    		
-//    		relevanceGraph.addVertex(origin);
-//    		relevanceGraph.addVertex(subreddits_string.get(1));
-//    		relevanceGraph.addVertex(subreddits_string.get(2));
-//    		relevanceGraph.addVertex(subreddits_string.get(3));
-//    		
-//    		relevanceGraph.addEdge(origin, subreddits_string.get(1));
-//    		relevanceGraph.addEdge(origin, subreddits_string.get(2));
-//    		relevanceGraph.addEdge(subreddits_string.get(2), subreddits_string.get(3));
-//    		
-//    		relevanceGraph.setEdgeWeight(origin, subreddits_string.get(1), 1);
-//    		relevanceGraph.setEdgeWeight(origin, subreddits_string.get(2), 2);
-//    		relevanceGraph.setEdgeWeight(subreddits_string.get(2), subreddits_string.get(3), 4);
-//    		
-    		
+    		 for (int r=0; r<topRel.size(); r++) System.out.println(topRed.get(r) + "   " + topRel.get(r));
     		
     		
     		
