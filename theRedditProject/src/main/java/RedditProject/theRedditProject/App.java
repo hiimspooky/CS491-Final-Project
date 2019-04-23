@@ -27,7 +27,6 @@ import org.jgrapht.*;
 import org.jgrapht.graph.*;
 import org.jgrapht.util.*;
 import org.jgrapht.alg.shortestpath.*;
-import org.jgrapht.alg.interfaces.AStarAdmissibleHeuristic;
 import org.jgrapht.alg.interfaces.ShortestPathAlgorithm.*;
 
 
@@ -220,14 +219,25 @@ public class App
     		 for (int a=0; a<subreddits_string.size(); a++) {
     			 graph.addVertex(subreddits_string.get(a));
     			 graph.addEdge(origin, subreddits_string.get(a));
-    			 graph.setEdgeWeight(origin, subreddits_string.get(a), subreddits_relevancy.get(a));
+    			 graph.setEdgeWeight(origin, subreddits_string.get(a), 1/subreddits_relevancy.get(a));
     			 names.add(subreddits_string.get(a));
     		 }
     		 
-     		DijkstraShortestPath<String, DefaultEdge> alg = new DijkstraShortestPath<String, DefaultEdge>(graph);
+    		 
+    		 for (int x=0; x<total_subreddit_list.size(); x++) {
+    			 for (int y=0; y<total_subreddit_list.get(x).urls.size(); y++) {
+    				 
+    			 }
+    		 }
+    		
+    		 
+     		 DijkstraShortestPath<String, DefaultEdge> alg = new DijkstraShortestPath<String, DefaultEdge>(graph);
       		
-    		SingleSourcePaths<String, DefaultEdge> iPaths = alg.getPaths(origin);
-    		System.out.println(alg.getPathWeight(origin, subreddits_string.get(1)));
+    		 SingleSourcePaths<String, DefaultEdge> iPaths = alg.getPaths(origin);
+    		 System.out.println(alg.getPathWeight(origin, subreddits_string.get(1)));
+    		
+    		
+    		
     			 
     		 
     		 
