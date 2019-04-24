@@ -79,12 +79,14 @@ public class App
     		Vector<String> subreddits_string = new Vector<String>();
     		Vector<String> subreddits_subs = new Vector<String>();
     		Vector<String> subreddits_scores = new Vector<String>();
+    		Vector<String> subreddits_comments_string = new Vector<String>();
     		for (int a = 0; a < splitText.length; a++) {
     			if (splitText[a].contains("\"subreddit\":")) {
     				subreddits_string.add(splitText[a+1]);
     			}
     			else if (splitText[a].contains("\"subreddit_subscribers\":")) subreddits_subs.add(splitText[a+1]);
     			else if (splitText[a].contains("\"score\":")) subreddits_scores.add(splitText[a+1]);
+    			else if (splitText[a].contains("\"num_comments\":")) subreddits_comments_string.add(splitText[a+1]);
     		}
     		
     		for (int c = 0; c < subreddits_subs.size(); c++) {
@@ -93,6 +95,16 @@ public class App
     		
     		for (int c = 0; c < subreddits_scores.size(); c++) { 
     			subreddits_scores.set(c, subreddits_scores.get(c).replace(",", ""));
+    		}
+    		
+    		for (int c = 0; c < subreddits_comments_string.size(); c++) {
+    			subreddits_comments_string.set(c, subreddits_scores.get(c).replace(",", ""));
+    		}
+    		
+    		Vector<Integer> subreddits_comments = new Vector<Integer>();
+    		
+    		for (int c = 0; c < subreddits_comments_string.size(); c++) {
+    			subreddits_comments.add(Integer.parseInt(subreddits_comments_string.get(c)));
     		}
     		
     		for (int c = 0; c < subreddits_string.size(); c++) {
