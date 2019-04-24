@@ -231,7 +231,7 @@ public class App
     		
     		 System.out.println("here");
     		
-    		 Graph<String, DefaultEdge> graph = new SimpleDirectedWeightedGraph<String, DefaultEdge>(DefaultEdge.class);
+    		 Graph<String, DefaultEdge> graph = new DirectedWeightedPseudograph<String, DefaultEdge>(DefaultEdge.class);
     		 
     		 Vector<String> names = new Vector<String>();
     		 
@@ -255,6 +255,7 @@ public class App
     		 System.out.println("OLD IS SIZE " + old_subreddits_string.size() + " AND TOTAL IS SIZE " + total_subreddit_list.size());
     		 
     		 for (int x=0; x<total_subreddit_list.size(); x++) {
+//    			 System.out.println("\n\n\n\n" + total_subreddit_list.get(x).name + "\n\n\n\n");
     			 for (int y=0; y<total_subreddit_list.get(x).urls.size(); y++) {
     				 doc = Jsoup.connect("https://www.reddit.com/api/info.json?url=" + total_subreddit_list.get(x).urls.get(y)).ignoreContentType(true).get();
     			     body = doc.body();
@@ -322,52 +323,56 @@ public class App
     			    			subreddits_string.set(c, temp);
     			    		}
     			    		
+    			    		String parent = total_subreddit_list.get(x).name;
+    			    		
     			    		for (int a=0; a<subreddits_string.size(); a++) {
-    			    			if (names.contains(subreddits_string.get(a)) == false) {
-    			    				graph.addVertex(subreddits_string.get(a));
-    			    				names.add(subreddits_string.get(a));
-    			    			}
-    			    			 graph.addEdge(origin, subreddits_string.get(a));
-    			    			 
-    			    			 System.out.println("Size of vectors: "
-    			    					 + subreddits_scores.size() + " , "
-    			    					 + subreddits_comments.size() + " , "
-    			    					 + subreddits_subs.size()
-    			    			 );
-    			    					 
-    			    					 
-    			    					 
-    			    					 
-    			    			 
-    			    			 System.out.println(
-    			    				"Score: " + Double.parseDouble(subreddits_scores.get(a)) + " | " +
-    			    				"Comments: " + (double)subreddits_comments.get(a) + " | " +
-    			    				"Subs: " + Double.parseDouble(subreddits_subs.get(a)) + " | " +
-    			    				"Edge weight: " + 1/((Double.parseDouble(subreddits_scores.get(a)) + (double)subreddits_comments.get(a))/Double.parseDouble(subreddits_subs.get(a)))
-    			    			);
-    			    			 
-    			    			 
-    			    			 
-    			    			 if (eq == 's') {
-    			    				 
-    			    			
-    			    				 
-    			    				 graph.setEdgeWeight(origin, subreddits_string.get(a), 1/(Double.parseDouble(subreddits_scores.get(a))/Double.parseDouble(subreddits_subs.get(a))));
-    			    			 }
-    			    			 else if (eq == 'c') {
-    			    				 graph.setEdgeWeight(origin, subreddits_string.get(a), 1/((double)subreddits_comments.get(a)/Double.parseDouble(subreddits_subs.get(a))));
-    			    			 }
-    			    			 else if (eq == 'b') {
-    			    				 
-    			    				 if (Double.parseDouble(subreddits_subs.get(a)) < 50 || Double.parseDouble(subreddits_scores.get(a)) <= 2) {
-        			    				 graph.setEdgeWeight(origin, subreddits_string.get(a), 999999999);
-
-    			    				 }
-    			    				 else {
-//    			    				 	graph.setEdgeWeight(origin, subreddits_string.get(a), 1/ ((Double.parseDouble(subreddits_scores.get(a)) + subreddits_comments.get(x))));
-    			    					 graph.setEdgeWeight(origin, subreddits_string.get(a), 1/((Double.parseDouble(subreddits_scores.get(a)) + (double)subreddits_comments.get(a))/Double.parseDouble(subreddits_subs.get(a))));
-    			    				 }
-    			    			 }
+//    			    			if (parent != subreddits_string.get(a)){
+	    			    			if (names.contains(subreddits_string.get(a)) == false) {
+	    			    				graph.addVertex(subreddits_string.get(a));
+	    			    				names.add(subreddits_string.get(a));
+	    			    			}
+	    			    			 graph.addEdge(parent, subreddits_string.get(a));
+	    			    			 
+	    			    			 System.out.println("Size of vectors: "
+	    			    					 + subreddits_scores.size() + " , "
+	    			    					 + subreddits_comments.size() + " , "
+	    			    					 + subreddits_subs.size()
+	    			    			 );
+	    			    					 
+	    			    					 
+	    			    					 
+	    			    					 
+	    			    			 
+	    			    			 System.out.println(
+	    			    				"Score: " + Double.parseDouble(subreddits_scores.get(a)) + " | " +
+	    			    				"Comments: " + (double)subreddits_comments.get(a) + " | " +
+	    			    				"Subs: " + Double.parseDouble(subreddits_subs.get(a)) + " | " +
+	    			    				"Edge weight: " + 1/((Double.parseDouble(subreddits_scores.get(a)) + (double)subreddits_comments.get(a))/Double.parseDouble(subreddits_subs.get(a)))
+	    			    			);
+	    			    			 
+	    			    			 
+	    			    			 
+	    			    			 if (eq == 's') {
+	    			    				 
+	    			    			
+	    			    				 
+	    			    				 graph.setEdgeWeight(parent, subreddits_string.get(a), 1/(Double.parseDouble(subreddits_scores.get(a))/Double.parseDouble(subreddits_subs.get(a))));
+	    			    			 }
+	    			    			 else if (eq == 'c') {
+	    			    				 graph.setEdgeWeight(parent, subreddits_string.get(a), 1/((double)subreddits_comments.get(a)/Double.parseDouble(subreddits_subs.get(a))));
+	    			    			 }
+	    			    			 else if (eq == 'b') {
+	    			    				 
+	    			    				 if (Double.parseDouble(subreddits_subs.get(a)) < 50 || Double.parseDouble(subreddits_scores.get(a)) <= 2) {
+	        			    				 graph.setEdgeWeight(parent, subreddits_string.get(a), 999999999);
+	
+	    			    				 }
+	    			    				 else {
+	//    			    				 	graph.setEdgeWeight(origin, subreddits_string.get(a), 1/ ((Double.parseDouble(subreddits_scores.get(a)) + subreddits_comments.get(x))));
+	    			    					 graph.setEdgeWeight(parent, subreddits_string.get(a), 1/((Double.parseDouble(subreddits_scores.get(a)) + (double)subreddits_comments.get(a))/Double.parseDouble(subreddits_subs.get(a))));
+	    			    				 }
+	    			    			 }
+//    			    			}
     			    		}
     			     }
     			 }
