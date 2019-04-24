@@ -56,7 +56,7 @@ public class App
     	else {
     		
     		int searchDegree = 0;
-    		
+    		int limit = 0;
     		int numSubReddits = 0;
     		String findStr = "subreddit\": \"";
     		int lastIndex = 0;
@@ -122,6 +122,10 @@ public class App
     		
     		System.out.println("How would you like relevancy calculated by? (s for score, c for comments, b for both)");
             char eq = myObj.next().charAt(0);
+            
+            System.out.println("How many subreddits would you like returned?");
+//            limit = Integer.parseInt(myObj.nextLine());
+            limit = myObj.nextInt();
     		
     		Vector<Double> subreddits_relevancy = new Vector<Double>();
     		
@@ -362,9 +366,8 @@ public class App
     				}
     			 }
     		 }
-    		 
-    		 for (int r=0; r<topRel.size(); r++) System.out.println(topRed.get(r) + "   " + topRel.get(r));
-    		
+    		 if (limit > topRel.size()) for (int r=0; r<topRel.size(); r++) System.out.println(topRed.get(r) + "   " + topRel.get(r));
+    		 else  for (int r=0; r<limit; r++) System.out.println(topRed.get(r) + "   " + topRel.get(r));
     		
     		
     	
