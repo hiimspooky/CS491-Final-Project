@@ -98,7 +98,7 @@ public class App
     		}
     		
     		for (int c = 0; c < subreddits_comments_string.size(); c++) {
-    			subreddits_comments_string.set(c, subreddits_scores.get(c).replace(",", ""));
+    			subreddits_comments_string.set(c, subreddits_comments_string.get(c).replace(",", ""));
     		}
     		
     		Vector<Integer> subreddits_comments = new Vector<Integer>();
@@ -114,16 +114,22 @@ public class App
     			subreddits_string.set(c, temp);
     		}
     		
-    		for (int x = 0; x < subreddits_string.size(); x++) System.out.println(subreddits_string.get(x) + ": " + subreddits_subs.get(x) + " (" + subreddits_scores.get(x) + ")");
+    		for (int x = 0; x < subreddits_string.size(); x++) System.out.println(subreddits_string.get(x) + ": " + subreddits_subs.get(x) + " (" + subreddits_scores.get(x) + ")  " + subreddits_comments.get(x));
     		
     		System.out.println("Enter a search degree for related subreddits (Suggested 0,5,10):");
     		
     		searchDegree = Integer.parseInt(myObj.nextLine());
     		
+    		System.out.println("How would you like relevancy calculated by? (s for score, c for comments, b for both)");
+            char eq = myObj.next().charAt(0);
+    		
     		Vector<Double> subreddits_relevancy = new Vector<Double>();
     		
-    		for (int x = 0; x < subreddits_string.size(); x++) subreddits_relevancy.add(Double.parseDouble(subreddits_scores.get(x))/Double.parseDouble(subreddits_subs.get(x)));
-    		
+    		if (eq == 's') for (int x = 0; x < subreddits_string.size(); x++) subreddits_relevancy.add(Double.parseDouble(subreddits_scores.get(x))/Double.parseDouble(subreddits_subs.get(x)));
+    		else if (eq == 'c') {
+    			for (int x = 0; x < subreddits_string.size(); x++) subreddits_relevancy.add((double)subreddits_comments.get(x)/Double.parseDouble(subreddits_subs.get(x)));
+    		}
+    		else if (eq == 'b') for (int x = 0; x < subreddits_string.size(); x++) subreddits_relevancy.add((Double.parseDouble(subreddits_scores.get(x)) + (double)subreddits_comments.get(x))/Double.parseDouble(subreddits_subs.get(x)));
     		for (int x = 0; x < subreddits_relevancy.size(); x++) System.out.println(1/subreddits_relevancy.get(x));
     		
     		
@@ -270,6 +276,7 @@ public class App
     			    		subreddits_string = new Vector<String>();
     			    		subreddits_subs = new Vector<String>();
     			    		subreddits_scores = new Vector<String>();
+    			    		subreddits_comments_string = new Vector<String>();
     			    		
     			    		for (int a = 0; a < splitText.length; a++) {
     			    			if (splitText[a].contains("\"subreddit\":")) {
@@ -277,6 +284,7 @@ public class App
     			    			}
     			    			else if (splitText[a].contains("\"subreddit_subscribers\":")) subreddits_subs.add(splitText[a+1]);
     			    			else if (splitText[a].contains("\"score\":")) subreddits_scores.add(splitText[a+1]);
+    			    			else if (splitText[a].contains("\"num_comments\":")) subreddits_comments_string.add(splitText[a+1]);
     			    		}
 
     			    		for (int c = 0; c < subreddits_subs.size(); c++) {
@@ -285,6 +293,16 @@ public class App
 
     			    		for (int c = 0; c < subreddits_scores.size(); c++) {
     			    			subreddits_scores.set(c, subreddits_scores.get(c).replace(",", ""));
+    			    		}
+    			    		
+    			    		for (int c = 0; c < subreddits_comments_string.size(); c++) {
+    			    			subreddits_comments_string.set(c, subreddits_comments_string.get(c).replace(",", ""));
+    			    		}
+    			    		
+    			    		subreddits_comments = new Vector<Integer>();
+    			    		
+    			    		for (int c = 0; c < subreddits_comments_string.size(); c++) {
+    			    			subreddits_comments.add(Integer.parseInt(subreddits_comments_string.get(c)));
     			    		}
 
     			    		for (int c = 0; c < subreddits_string.size(); c++) {
@@ -300,8 +318,17 @@ public class App
     			    				names.add(subreddits_string.get(a));
     			    			}
     			    			 graph.addEdge(origin, subreddits_string.get(a));
-    			    			 graph.setEdgeWeight(origin, subreddits_string.get(a), 1/(Double.parseDouble(subreddits_scores.get(a))/Double.parseDouble(subreddits_subs.get(a))));
-    			    		 }
+    			    			 if (eq == 's') {
+    			    				 graph.setEdgeWeight(origin, subreddits_string.get(a), 1/(Double.parseDouble(subreddits_scores.get(a))/Double.parseDouble(subreddits_subs.get(a))));
+    			    			 }
+    			    			 else if (eq == 'c') {
+    			    				 graph.setEdgeWeight(origin, subreddits_string.get(a), 1/((double)subreddits_comments.get(a)/Double.parseDouble(subreddits_subs.get(a))));
+    			    			 }
+    			    			 else if (eq == 'b') {
+//    			    				 graph.setEdgeWeight(origin, subreddits_string.get(a), 1/ ((Double.parseDouble(subreddits_scores.get(a)) + subreddits_comments.get(x))));
+    			    				 graph.setEdgeWeight(origin, subreddits_string.get(a), 1/((Double.parseDouble(subreddits_scores.get(a)) + (double)subreddits_comments.get(a))/Double.parseDouble(subreddits_subs.get(a))));
+    			    			 }
+    			    		}
     			     }
     			 }
     		 }
@@ -319,18 +346,20 @@ public class App
     			 else {
     				 int flag = 1;
     				 double weight = alg.getPathWeight(origin, names.get(w));
-    				 for (int u=0; u<topRel.size(); u++) {
-    					 if (weight < topRel.get(u)) {
-    						 topRel.insertElementAt(weight, u);
-    						 topRed.insertElementAt(names.get(w), u);
-    						 flag = 0;
-    						 break;
-    					 }
-    				 }
-    				 if (flag == 1) {
-    					 topRel.add(weight);
-    					 topRed.add(names.get(w));
-    				 }
+    				 if (weight != 0) {
+	    				 for (int u=0; u<topRel.size(); u++) {
+	    					 if (weight < topRel.get(u)) {
+	    						 topRel.insertElementAt(weight, u);
+	    						 topRed.insertElementAt(names.get(w), u);
+	    						 flag = 0;
+	    						 break;
+	    					 }
+	    				 }
+	    				 if (flag == 1) {
+	    					 topRel.add(weight);
+	    					 topRed.add(names.get(w));
+	    				 }
+    				}
     			 }
     		 }
     		 
