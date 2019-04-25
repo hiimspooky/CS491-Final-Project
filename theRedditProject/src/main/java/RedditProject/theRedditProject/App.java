@@ -358,7 +358,10 @@ public class App
 	    			    					 graph.setEdgeWeight(parent, subreddits_string.get(a), 999999999);
 	    			    				 }
 	    			    				 else {
-	    			    					 graph.setEdgeWeight(parent, subreddits_string.get(a), 1/(Double.parseDouble(subreddits_scores.get(a))/Double.parseDouble(subreddits_subs.get(a))));
+	    			    					 graph.setEdgeWeight(parent, subreddits_string.get(a),
+	    			    					 1/
+	    			    					 ((Double.parseDouble(subreddits_scores.get(a)))/(Double.parseDouble(subreddits_subs.get(a))))
+	    			    					 );
 	    			    				 }
 	    			    				 
 	    			    			 }
