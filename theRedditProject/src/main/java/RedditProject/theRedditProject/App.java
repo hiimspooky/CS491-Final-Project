@@ -354,18 +354,27 @@ public class App
 	    			    			 
 	    			    			 if (eq == 's') {
 	    			    				 
-	    			    			
+	    			    				 if (Double.parseDouble(subreddits_subs.get(a)) < 50 || Double.parseDouble(subreddits_scores.get(a)) <= 2) {
+	    			    					 graph.setEdgeWeight(parent, subreddits_string.get(a), 999999999);
+	    			    				 }
+	    			    				 else {
+	    			    					 graph.setEdgeWeight(parent, subreddits_string.get(a), 1/(Double.parseDouble(subreddits_scores.get(a))/Double.parseDouble(subreddits_subs.get(a))));
+	    			    				 }
 	    			    				 
-	    			    				 graph.setEdgeWeight(parent, subreddits_string.get(a), 1/(Double.parseDouble(subreddits_scores.get(a))/Double.parseDouble(subreddits_subs.get(a))));
 	    			    			 }
 	    			    			 else if (eq == 'c') {
-	    			    				 graph.setEdgeWeight(parent, subreddits_string.get(a), 1/((double)subreddits_comments.get(a)/Double.parseDouble(subreddits_subs.get(a))));
-	    			    			 }
+	    			    				 
+	    			    				 if (Double.parseDouble(subreddits_subs.get(a)) < 50 || Double.parseDouble(subreddits_scores.get(a)) <= 2 || (double)subreddits_comments.get(a) < 1) {
+	    			    					 graph.setEdgeWeight(parent, subreddits_string.get(a), 999999999);
+	    			    				 }
+	    			    				 else {
+	    			    					 graph.setEdgeWeight(parent, subreddits_string.get(a), 1/((double)subreddits_comments.get(a)/Double.parseDouble(subreddits_subs.get(a))));
+	    			    				 }
+	    			    		     }
 	    			    			 else if (eq == 'b') {
 	    			    				 
 	    			    				 if (Double.parseDouble(subreddits_subs.get(a)) < 50 || Double.parseDouble(subreddits_scores.get(a)) <= 2) {
 	        			    				 graph.setEdgeWeight(parent, subreddits_string.get(a), 999999999);
-	
 	    			    				 }
 	    			    				 else {
 	//    			    				 	graph.setEdgeWeight(origin, subreddits_string.get(a), 1/ ((Double.parseDouble(subreddits_scores.get(a)) + subreddits_comments.get(x))));
