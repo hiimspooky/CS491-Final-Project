@@ -186,7 +186,7 @@ public class App
 				temp.name = subreddits_reference.get(x).getSubreddit();
 				temp.subscribers = subreddits_reference.get(x).about().getSubscribers();
 //    			for (int y = 0; y < 10; y++) if (firstPage.get(y) != null) System.out.println(firstPage.get(y).getUrl());
-    			for (int y = 0; y < DEFAULT_DEPTH; y++) {
+    			for (int y = 0; (y < DEFAULT_DEPTH) && (y < firstPage.size()); y++) {
     				if (firstPage.get(y) != null) {
     					temp.urls.add(firstPage.get(y).getUrl());
     					temp.scores.add(firstPage.get(y).getScore());
