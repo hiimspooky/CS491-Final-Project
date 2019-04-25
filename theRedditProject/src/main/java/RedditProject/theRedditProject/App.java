@@ -55,6 +55,7 @@ public class App
     	
     	else {
     		
+    		
     		int searchDegree = 0;
     		int limit = 0;
     		int numSubReddits = 0;
