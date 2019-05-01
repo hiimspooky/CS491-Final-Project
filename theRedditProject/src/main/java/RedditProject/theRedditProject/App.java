@@ -33,12 +33,14 @@ import org.jgrapht.alg.interfaces.ShortestPathAlgorithm.*;
 public class App 
 {
 	
-	static int DEFAULT_DEPTH = 10;
+
 	
 
 	
     public static void main( String[] args ) throws IOException
     {
+    	
+    	int DEFAULT_DEPTH = 10;
     	
         Scanner myObj = new Scanner(System.in);
         System.out.println("Enter URL exactly as it appears in browser (Copy and Paste it!)");
@@ -56,7 +58,6 @@ public class App
     	else {
     		
     		
-    		int searchDegree = 0;
     		int limit = 0;
     		int numSubReddits = 0;
     		String findStr = "subreddit\": \"";
@@ -115,17 +116,15 @@ public class App
     			subreddits_string.set(c, temp);
     		}
     		
-    		for (int x = 0; x < subreddits_string.size(); x++) System.out.println(subreddits_string.get(x) + ": " + subreddits_subs.get(x) + " (" + subreddits_scores.get(x) + ")  " + subreddits_comments.get(x));
     		
-    		System.out.println("Enter a search degree for related subreddits (Suggested 0,5,10):");
+    		System.out.println("Enter a search degree for related subreddits (Note: 0 will return only subreddits the link has been posted to. 10 is recommended):");
     		
-    		searchDegree = Integer.parseInt(myObj.nextLine());
+    		DEFAULT_DEPTH = Integer.parseInt(myObj.nextLine());
     		
     		System.out.println("How would you like relevancy calculated by? (s for score, c for comments, b for both)");
             char eq = myObj.next().charAt(0);
             
             System.out.println("How many subreddits would you like returned?");
-//            limit = Integer.parseInt(myObj.nextLine());
             limit = myObj.nextInt();
     		
     		Vector<Double> subreddits_relevancy = new Vector<Double>();
@@ -135,8 +134,7 @@ public class App
     			for (int x = 0; x < subreddits_string.size(); x++) subreddits_relevancy.add((double)subreddits_comments.get(x)/Double.parseDouble(subreddits_subs.get(x)));
     		}
     		else if (eq == 'b') for (int x = 0; x < subreddits_string.size(); x++) subreddits_relevancy.add((Double.parseDouble(subreddits_scores.get(x)) + (double)subreddits_comments.get(x))/Double.parseDouble(subreddits_subs.get(x)));
-    		for (int x = 0; x < subreddits_relevancy.size(); x++) System.out.println(1/subreddits_relevancy.get(x));
-    		
+
     		
 
     		UserAgent userAgent = new UserAgent("java:RedditProject:v1.0 (by /u/cs491smda)");
@@ -145,35 +143,14 @@ public class App
     		NetworkAdapter adapter = new OkHttpNetworkAdapter(userAgent);
     		RedditClient reddit = net.dean.jraw.oauth.OAuthHelper.automatic(adapter, credentials);
 
-    		Subreddit sr = reddit.subreddit("RocketLeague").about();
-    		//System.out.println(sr.toString());
-    		System.out.println(sr.getSubscribers());
+
     		Vector<SubredditReference> subreddits_reference = new Vector<SubredditReference>();
     		for (int x = 0; x < subreddits_string.size(); x++) subreddits_reference.add(reddit.subreddit(subreddits_string.get(x)));
-    		
-    		for (int x = 0; x < subreddits_reference.size(); x++) System.out.println(subreddits_reference.get(x).getSubreddit());
-    		
-    		
-    		/*
-    		DefaultPaginator<Submission> paginator = subreddits_reference.get(0).posts()
-    				.limit(Paginator.RECOMMENDED_MAX_LIMIT)
-    				.sorting(SubredditSort.TOP)
-    				.timePeriod(TimePeriod.ALL)
-    				.build();
-    		
-    		
-    		Listing<Submission> firstPage = paginator.next();
-    		
-    		*/
-    		
-    		System.out.println("FLAGFLAGFLAG");
     		
     		
     		Vector<subreddit_top_posts> total_subreddit_list = new Vector<subreddit_top_posts>();
     		
     		for (int x = 0; x < subreddits_reference.size(); x++) {
-    			
-//    			System.out.println(subreddits_reference.get(x).getSubreddit());
     			
     			DefaultPaginator<Submission> paginator = subreddits_reference.get(x).posts()
         				.limit(Paginator.RECOMMENDED_MAX_LIMIT)
@@ -186,7 +163,6 @@ public class App
 				subreddit_top_posts temp = new subreddit_top_posts();
 				temp.name = subreddits_reference.get(x).getSubreddit();
 				temp.subscribers = subreddits_reference.get(x).about().getSubscribers();
-//    			for (int y = 0; y < 10; y++) if (firstPage.get(y) != null) System.out.println(firstPage.get(y).getUrl());
     			for (int y = 0; (y < DEFAULT_DEPTH) && (y < firstPage.size()); y++) {
     				if (firstPage.get(y) != null) {
     					temp.urls.add(firstPage.get(y).getUrl());
@@ -198,39 +174,13 @@ public class App
     			total_subreddit_list.add(temp);
     			
     			
-    			
-    			//for (int y = 0; y < 10; y++) if (firstPage. != null) total_subreddit_list.add(
-    			
-    			
     		}
-    		
-    		System.out.println("GALFGALFGALF");
-    		
-//    		System.out.println(total_subreddit_list.size());
-//    		for (int x = 0; x < total_subreddit_list.size(); x++) {
-//    			System.out.println(total_subreddit_list.get(x).name + " with " + total_subreddit_list.get(x).subscribers + " subscribers");
-//    			for (int y = 0; y < total_subreddit_list.get(x).urls.size(); y++) {
-//    				System.out.println(total_subreddit_list.get(x).urls.get(y));
-//    				System.out.println(total_subreddit_list.get(x).numComments.get(y));
-//    			}
-//    		}
-    		
-    		
-    		
-    		/*
-    		for (Submission post : firstPage) {
-    			System.out.println(String.format("%s (/r/%s, %s points) - %s",
-                        post.getTitle(), post.getSubreddit(), post.getScore(), post.getUrl()));
-    		}
-    		*/
-    		
     		
     		Vector<String> old_subreddits_string = new Vector<String>();
     		
     		
     		//Construct graph
     		
-    		 System.out.println("here");
     		
     		 Graph<String, DefaultEdge> graph = new DirectedWeightedPseudograph<String, DefaultEdge>(DefaultEdge.class);
     		 
@@ -240,7 +190,6 @@ public class App
     		 graph.addVertex(origin);
     		 
     		 for (int a=0; a<subreddits_string.size(); a++) {
-//    		 for (int a = 0; a < total_subreddit_list.size(); a++) {
     			 if (names.contains(subreddits_string.get(a)) == false) {
     				 old_subreddits_string.add(subreddits_string.get(a));
     				 graph.addVertex(subreddits_string.get(a));
@@ -248,15 +197,12 @@ public class App
     			 }
     			 graph.addEdge(origin, subreddits_string.get(a));
     			 
- //   			 if (subreddits_relevancy.get(a))
     			 
     			 graph.setEdgeWeight(origin, subreddits_string.get(a), 1/(double)subreddits_relevancy.get(a)); //Changed to cast as a double
     		 }
     		 
-    		 System.out.println("OLD IS SIZE " + old_subreddits_string.size() + " AND TOTAL IS SIZE " + total_subreddit_list.size());
     		 
     		 for (int x=0; x<total_subreddit_list.size(); x++) {
-//    			 System.out.println("\n\n\n\n" + total_subreddit_list.get(x).name + "\n\n\n\n");
     			 for (int y=0; y<total_subreddit_list.get(x).urls.size(); y++) {
     				 doc = Jsoup.connect("https://www.reddit.com/api/info.json?url=" + total_subreddit_list.get(x).urls.get(y)).ignoreContentType(true).get();
     			     body = doc.body();
@@ -334,22 +280,22 @@ public class App
 	    			    			}
 	    			    			 graph.addEdge(parent, subreddits_string.get(a));
 	    			    			 
-	    			    			 System.out.println("Size of vectors: "
-	    			    					 + subreddits_scores.size() + " , "
-	    			    					 + subreddits_comments.size() + " , "
-	    			    					 + subreddits_subs.size()
-	    			    			 );
+//	    			    			 System.out.println("Size of vectors: "
+//	    			    					 + subreddits_scores.size() + " , "
+//	    			    					 + subreddits_comments.size() + " , "
+//	    			    					 + subreddits_subs.size()
+//	    			    			 );
 	    			    					 
 	    			    					 
 	    			    					 
 	    			    					 
 	    			    			 
-	    			    			 System.out.println(
-	    			    				"Score: " + Double.parseDouble(subreddits_scores.get(a)) + " | " +
-	    			    				"Comments: " + (double)subreddits_comments.get(a) + " | " +
-	    			    				"Subs: " + Double.parseDouble(subreddits_subs.get(a)) + " | " +
-	    			    				"Edge weight: " + 1/((Double.parseDouble(subreddits_scores.get(a)) + (double)subreddits_comments.get(a))/Double.parseDouble(subreddits_subs.get(a)))
-	    			    			);
+//	    			    			 System.out.println(
+//	    			    				"Score: " + Double.parseDouble(subreddits_scores.get(a)) + " | " +
+//	    			    				"Comments: " + (double)subreddits_comments.get(a) + " | " +
+//	    			    				"Subs: " + Double.parseDouble(subreddits_subs.get(a)) + " | " +
+//	    			    				"Edge weight: " + 1/((Double.parseDouble(subreddits_scores.get(a)) + (double)subreddits_comments.get(a))/Double.parseDouble(subreddits_subs.get(a)))
+//	    			    			);
 	    			    			 
 	    			    			 
 	    			    			 
@@ -420,12 +366,14 @@ public class App
     				}
     			 }
     		 }
-    		 if (limit > topRel.size()) for (int r=0; r<topRel.size(); r++) System.out.println(topRed.get(r) + "   " + topRel.get(r));
-    		 else  for (int r=0; r<limit; r++) System.out.println(topRed.get(r) + "   " + topRel.get(r));
+    		 System.out.println("\nRecommended subreddits:\n");
+    		 if (limit > topRel.size()) for (int r=0; r<topRel.size(); r++) System.out.println(r+1 + ".\t" + topRed.get(r) + "\t(" + topRel.get(r) + ")");
+    		 else for (int r=0; r<limit; r++) System.out.println(r+1 + ".\t" + topRed.get(r) + "\t(" + topRel.get(r) + ")");
     		
     		
     	
     	} //closes else
     	
+    	myObj.close();
     }
 }
