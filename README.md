@@ -2,8 +2,6 @@
 
 Allows the user to input a URL and will try to recommend subreddits based on the link and user-selected options.
 
-Implemented in Java, dependencies found in pom.xml
-
 Brief summary of process:
 
 1. Ask user for a URL
@@ -18,3 +16,5 @@ Brief summary of process:
 
 Based on our findings, using the algorithms we implemented, post score seems to be the most optimal way to determine relevancy of a subreddit.
 Determining relevancy based on post comment count provides interesting and valuable information, but is liable to being heavily influenced by odd occurrences.
+
+Implemented in Java, dependencies found in pom.xml
